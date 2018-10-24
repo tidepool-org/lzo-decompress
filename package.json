@@ -1,0 +1,32 @@
+{
+  "name": "lzo-decompress",
+  "version": "0.0.1",
+  "description": "LZO decompression using Node.js",
+  "main": "index.js",
+  "scripts": {
+    "install": "node-gyp-build",
+    "prebuild": "prebuildify --napi",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tidepool-org/lzo-decompress.git"
+  },
+  "keywords": [
+    "lzo",
+    "node"
+  ],
+  "author": "Gerrit Niezen <gerrit@tidepool.org>",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/tidepool-org/lzo-decompress/issues"
+  },
+  "homepage": "https://github.com/tidepool-org/lzo-decompress#readme",
+  "dependencies": {
+    "napi-macros": "1.7.0",
+    "node-gyp-build": "3.4.0"
+  },
+  "devDependencies": {
+    "prebuildify": "2.7.0"
+  }
+}
