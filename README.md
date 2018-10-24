@@ -1,4 +1,4 @@
-# node-mtp
+# lzo-decompress [still WIP]
 
 Use LZO for decompression on Node.js
 
