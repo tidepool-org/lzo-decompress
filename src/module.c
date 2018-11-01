@@ -4,27 +4,25 @@
 #include <stdlib.h>
 #include "lzo.h"
 
-#define BUFFER_SIZE 200
-
 NAPI_METHOD(decompress) {
-  NAPI_ARGV(2)
-  NAPI_ARGV_BUFFER(in, 0)
-  NAPI_ARGV_INT32(length, 1)
+  NAPI_ARGV(2) // there are two arguments passed in
+  NAPI_ARGV_BUFFER(inputBuffer, 0)
+  NAPI_ARGV_INT32(outputBufferSize, 1)
 
-  int outlen = BUFFER_SIZE;
-  unsigned char *out = malloc(outlen);
+  unsigned char *outputBuffer = malloc(outputBufferSize);
+  int remaining = outputBufferSize;
   napi_value result;
+  int inputBufferSize = inputBuffer_len; // set by NAPI_ARGV_BUFFER
 
-  int ret = av_lzo1x_decode(out, &outlen, in, &length);
-  int size = BUFFER_SIZE - outlen;
+  int ret = av_lzo1x_decode(outputBuffer, &remaining, inputBuffer, &inputBufferSize);
 
   if (ret != 0) {
-    napi_throw_error(env, NULL, "Failed to decompress");
+    napi_throw_error(env, NULL, "Failed to decompress, %d bytes remaining", remaining);
   }
 
-  NAPI_STATUS_THROWS(napi_create_buffer_copy(env, size, out, NULL, &result));
+  NAPI_STATUS_THROWS(napi_create_buffer_copy(env, outputBufferSize, outputBuffer, NULL, &result));
 
-  free(out);
+  free(outputBuffer);
 
   return result;
 }
