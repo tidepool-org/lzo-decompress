@@ -17,7 +17,7 @@ NAPI_METHOD(decompress) {
   int ret = av_lzo1x_decode(outputBuffer, &remaining, inputBuffer, &inputBufferSize);
 
   if (ret != 0) {
-    napi_throw_error(env, NULL, "Failed to decompress, %d bytes remaining", remaining);
+    napi_throw_error(env, NULL, "Failed to decompress");
   }
 
   NAPI_STATUS_THROWS(napi_create_buffer_copy(env, outputBufferSize, outputBuffer, NULL, &result));
