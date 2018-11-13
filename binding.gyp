@@ -5,9 +5,18 @@
         "library_dirs": [
           "../lib",
         ],
-        "libraries": [
-            "-lavutil"
-        ],
+        "conditions": [ [ "OS!='win'", {
+            "libraries": [
+                "-lavutil"
+            ],
+        } ] ],
+        'msvs_settings': {
+          'VCLinkerTool': {
+            'AdditionalLibraryDirectories': [
+              '../lib'
+            ],
+          },
+        },
         "include_dirs": [
           "<!(node -e \"require('napi-macros')\")"
         ]
