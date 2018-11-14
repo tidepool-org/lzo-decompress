@@ -19,7 +19,7 @@
               {
                 'link_settings': {
                   'libraries': [
-                    '-../lib/lavutil.lib'
+                    '-l../lib/avutil.lib'
                   ],
                 }
               }
