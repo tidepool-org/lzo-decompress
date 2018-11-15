@@ -17,6 +17,8 @@ os:
 - osx
 - linux
 - windows
+env:
+- YARN_GPG=no # otherwise windows build hangs
 before_install:
   - if [ $TRAVIS_OS_NAME = windows ]; then cinst -y python2; fi
 before_deploy:
