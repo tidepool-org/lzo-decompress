@@ -17,11 +17,17 @@
             ],
             ['OS=="win"',
               {
-                'link_settings': {
                   'libraries': [
                     '-l../lib/avutil.lib'
                   ],
-                }
+                  'copies': [
+                      {
+                        'destination': '$(SolutionDir)$(ConfigurationName)',
+                        'files': [
+                          '<(module_root_dir)/lib/<(target_arch)/avutil-56.dll'
+                        ]
+                      }
+                  ]
               }
             ]
         ],
