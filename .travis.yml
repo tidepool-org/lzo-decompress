@@ -12,12 +12,12 @@ addons:
     - g++-4.8-multilib
     - gcc-multilib
     - g++-multilib
+    - libavutil-dev
 os:
 - osx
 - linux
 - windows
 before_install:
-  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libavutil-dev; fi
   - if [ $TRAVIS_OS_NAME = windows ]; then cinst -y python2; fi
 before_deploy:
 - ARCHIVE_NAME="${TRAVIS_TAG:-latest}-$TRAVIS_OS_NAME-`uname -m`.tar"
