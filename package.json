@@ -1,6 +1,6 @@
 {
   "name": "lzo-decompress",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "LZO decompression using Node.js",
   "main": "index.js",
   "scripts": {
