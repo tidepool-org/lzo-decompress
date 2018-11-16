@@ -2,23 +2,25 @@
     "targets": [{
         "target_name": "module",
         "sources": [ "./src/module.c" ],
-        "library_dirs": [
-          "../lib",
-        ],
+
         'conditions': [
             ['OS!="win"',
               {
-                'link_settings': {
-                  'libraries': [
+                'library_dirs': [
+                    '../lib'
+                ],
+                'libraries': [
                     '-lavutil'
-                  ]
-                }
+                ]
               }
             ],
             ['OS=="win"',
               {
+                  'library_dirs': [
+                      '../<(target_arch)/lib'
+                  ],
                   'libraries': [
-                    '-l../lib/avutil.lib'
+                    '-l../lib/<(target_arch)/avutil.lib'
                   ],
                   'copies': [
                       {

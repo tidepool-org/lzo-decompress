@@ -6,6 +6,7 @@
   "scripts": {
     "install": "node-gyp-build",
     "prebuild": "prebuildify --napi",
+    "prebuild-ia32": "prebuildify --arch=ia32 --napi",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "repository": {
