@@ -1,4 +1,4 @@
-# lzo-decompress [still WIP]
+# lzo-decompress
 
 Use LZO for decompression on Node.js
 
@@ -16,7 +16,8 @@ lzo.decompress(input, length);
 
 ## Building
 
-TODO
+- yarn prebuild
+- yarn prebuild-ia32 (for 32-bit versions)
 
 ## Updating on Yarn/NPM
 
