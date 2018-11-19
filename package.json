@@ -23,12 +23,9 @@
     "url": "https://github.com/tidepool-org/lzo-decompress/issues"
   },
   "homepage": "https://github.com/tidepool-org/lzo-decompress#readme",
-  "dependencies": {
-    "napi-macros": "1.7.0",
-    "node-gyp": "3.8.0",
-    "node-gyp-build": "3.5.0"
-  },
   "devDependencies": {
-    "prebuildify": "2.9.1"
+    "prebuildify": "2.9.1",
+    "napi-macros": "1.7.0",
+    "node-gyp-build": "3.5.0"
   }
 }
