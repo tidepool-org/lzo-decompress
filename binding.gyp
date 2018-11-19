@@ -17,7 +17,7 @@
             ['OS=="win"',
               {
                   'library_dirs': [
-                      '../<(target_arch)/lib'
+                      '../lib/<(target_arch)'
                   ],
                   'libraries': [
                     '-l../lib/<(target_arch)/avutil.lib'

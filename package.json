@@ -7,6 +7,7 @@
     "install": "node-gyp-build",
     "prebuild": "prebuildify --napi",
     "prebuild-ia32": "prebuildify --arch=ia32 --napi",
+    "prebuild-electron": "prebuildify -r electron -t 3.0.4",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "repository": {
