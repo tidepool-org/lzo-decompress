@@ -16,10 +16,12 @@ const lzo = require('lzo-decompress');
 lzo.decompress(input, length);
 ```
 
-## Building
+## Building from source
 
 - `yarn prebuild`
 - `yarn prebuild-ia32` (for 32-bit versions)
+
+On macOS, you may need to do `brew install ffmpeg` first.
 
 ## Updating on Yarn/NPM
 

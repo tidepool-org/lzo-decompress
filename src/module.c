@@ -7,12 +7,12 @@
 NAPI_METHOD(decompress) {
   NAPI_ARGV(2) // there are two arguments passed in
   NAPI_ARGV_BUFFER(inputBuffer, 0)
-  NAPI_ARGV_INT32(outputBufferSize, 1)
+  NAPI_ARGV_UINT32(outputBufferSize, 1)
 
-  unsigned char *outputBuffer = malloc(outputBufferSize);
+  unsigned char *outputBuffer = malloc(outputBufferSize + AV_LZO_OUTPUT_PADDING);
   int remaining = outputBufferSize;
   napi_value result;
-  int inputBufferSize = inputBuffer_len; // set by NAPI_ARGV_BUFFER
+  int inputBufferSize = inputBuffer_len + AV_LZO_INPUT_PADDING; // set by NAPI_ARGV_BUFFER
 
   int ret = av_lzo1x_decode(outputBuffer, &remaining, inputBuffer, &inputBufferSize);
 
