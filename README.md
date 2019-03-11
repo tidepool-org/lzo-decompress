@@ -23,7 +23,9 @@ lzo.decompress(input, length);
 
 On macOS, you may need to do `brew install ffmpeg` first.
 
-## Updating on Yarn/NPM
+## Instructions for Tidepool engineers
+
+### Updating on Yarn/NPM
 
 The following steps will update the module on Yarn/NPM:
 
@@ -34,3 +36,11 @@ The following steps will update the module on Yarn/NPM:
 - `npm publish`
 
 Note that you need to `yarn global add prebuildify-ci` to get the prebuilds.
+
+### Building ffmpeg
+
+If for some reason you need to rebuild the shared libraries, use the [ffmpeg-windows-build-helpers](https://github.com/rdp/ffmpeg-windows-build-helpers) script to build LGPL-licensed 32-bit and 64-bit cross-compiled shared libraries as follows:
+
+```
+./cross_compile_ffmpeg.sh --enable-gpl=n --build-ffmpeg-shared=y --compiler-flavors=multi
+```
