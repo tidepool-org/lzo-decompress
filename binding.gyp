@@ -2,8 +2,8 @@
     "targets": [{
         "target_name": "module",
         "sources": [ "./src/module.c" ],
-
-        'conditions': [
+        "win_delay_load_hook": "true",
+        "conditions": [
             ['OS!="win"',
               {
                 'library_dirs': [
