@@ -28,8 +28,6 @@ before_deploy:
 - if [ $TRAVIS_OS_NAME = osx ]; then cp "$TRAVIS_BUILD_DIR/lib/libavutil.dylib" "$TRAVIS_BUILD_DIR/prebuilds/darwin-x64/";
   install_name_tool -change "/usr/local/lib/libavutil.56.dylib" "@loader_path/libavutil.dylib"
   "$TRAVIS_BUILD_DIR/prebuilds/darwin-x64/node.napi.node"; otool -L "$TRAVIS_BUILD_DIR/prebuilds/darwin-x64/node.napi.node";
-  install_name_tool -change "/usr/local/lib/libavutil.56.dylib" "@loader_path/libavutil.dylib"
-  "$TRAVIS_BUILD_DIR/prebuilds/darwin-x64/electron.napi.node"; otool -L "$TRAVIS_BUILD_DIR/prebuilds/darwin-x64/electron.napi.node";
   fi
 - tar --create --verbose --file="$ARCHIVE_NAME" --directory "$TRAVIS_BUILD_DIR/prebuilds"
   .
