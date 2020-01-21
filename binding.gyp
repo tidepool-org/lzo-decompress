@@ -2,7 +2,6 @@
     "targets": [{
         "target_name": "module",
         "sources": [ "./src/module.c" ],
-        "win_delay_load_hook": "true",
         "conditions": [
             ['OS!="win"',
               {
