@@ -2,8 +2,7 @@
     "targets": [{
         "target_name": "module",
         "sources": [ "./src/module.c" ],
-
-        'conditions': [
+        "conditions": [
             ['OS!="win"',
               {
                 'library_dirs': [

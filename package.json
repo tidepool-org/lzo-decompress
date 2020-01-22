@@ -1,12 +1,12 @@
 {
   "name": "lzo-decompress",
-  "version": "0.1.2",
+  "version": "1.0.1",
   "description": "LZO decompression using Node.js",
   "main": "index.js",
   "scripts": {
     "install": "node-gyp-build",
-    "prebuild": "prebuildify --napi",
-    "prebuild-ia32": "prebuildify --arch=ia32 --napi",
+    "prebuild": "prebuildify -t 8.14.0 --napi --strip",
+    "prebuild-ia32": "prebuildify -t 8.14.0 --arch=ia32 --napi --strip",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "repository": {
@@ -24,10 +24,10 @@
   },
   "homepage": "https://github.com/tidepool-org/lzo-decompress#readme",
   "dependencies": {
-    "napi-macros": "1.7.0",
-    "node-gyp-build": "3.5.0"
+    "napi-macros": "2.0.0",
+    "node-gyp-build": "4.2.0"
   },
   "devDependencies": {
-    "prebuildify": "2.9.1"
+    "prebuildify": "3.0.4"
   }
 }
