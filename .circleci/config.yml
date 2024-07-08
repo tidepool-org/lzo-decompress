@@ -71,6 +71,20 @@ jobs:
             ARCHIVE_NAME="${CIRCLE_TAG:-latest}-windows-`uname -m`.tar"
             tar --create --verbose --file="$ARCHIVE_NAME" --directory "./prebuilds" .
 
+  deploy:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - run:
+          name: Install GitHub release tool
+          command: |
+            curl -sL https://github.com/github-release/github-release/releases/download/v0.9.0/linux-amd64-github-release.bz2 | bzip2 -d > github-release
+            chmod +x github-release
+      - run:
+          name: Upload to GitHub Releases
+          command: |
+            ./github-release upload --tag $CIRCLE_TAG --name "$ARCHIVE_NAME" --file "$ARCHIVE_NAME" --prerelease
+
 workflows:
   version: 2
   build-and-deploy:
@@ -78,29 +92,12 @@ workflows:
       - build-linux
       - build-macos
       - build-windows
-
-  deploy:
-    jobs:
-      - build-linux:
-          requires:
-            - build-linux
-      - build-macos:
-          requires:
-            - build-macos
-      - build-windows:
-          requires:
-            - build-windows
       - deploy:
-          name: Deploy
-          type: approval
           requires:
             - build-linux
             - build-macos
             - build-windows
-          steps:
-            - run:
-                name: Deploy to GitHub Releases
-                command: |
-                  curl -sL https://github.com/github-release/github-release/releases/download/v0.9.0/linux-amd64-github-release.bz2 | bzip2 -d > github-release
-                  chmod +x github-release
-                  ./github-release upload --tag $CIRCLE_TAG --name "$ARCHIVE_NAME" --file "$ARCHIVE_NAME" --prerelease
+          filters:
+            tags:
+              only: /^v.*/
+
