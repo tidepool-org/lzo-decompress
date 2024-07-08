@@ -1,0 +1,106 @@
+version: 2.1
+
+jobs:
+  build-linux:
+    docker:
+      - image: circleci/node:18.17.1
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: sudo apt-get update && sudo apt-get install -y g++-4.8 gcc-4.8-multilib g++-4.8-multilib gcc-multilib g++-multilib libavutil-dev
+      - run: yarn install
+      - run: yarn test
+      - run:
+          name: Prebuild
+          command: yarn prebuild
+      - run:
+          name: Create archive
+          command: |
+            ARCHIVE_NAME="${CIRCLE_TAG:-latest}-linux-`uname -m`.tar"
+            tar --create --verbose --file="$ARCHIVE_NAME" --directory "./prebuilds" .
+
+  build-macos:
+    resource_class: macos.m1.medium.gen1
+    environment:
+      BASH_ENV: ".circleci/bash_env.sh"
+    macos:
+      xcode: '13.4.1'
+    steps:
+      - checkout
+      - run: yarn install
+      - run: yarn test
+      - run:
+          name: Prebuild
+          command: yarn prebuild
+      - run:
+          name: Modify macOS binaries
+          command: |
+            cp "$PWD/lib/libavutil.dylib" "$PWD/prebuilds/darwin-x64/"
+            install_name_tool -change "/usr/local/lib/libavutil.56.dylib" "@loader_path/libavutil.dylib" "$PWD/prebuilds/darwin-x64/node.napi.node"
+            otool -L "$PWD/prebuilds/darwin-x64/node.napi.node"
+      - run:
+          name: Create archive
+          command: |
+            ARCHIVE_NAME="${CIRCLE_TAG:-latest}-macos-`uname -m`.tar"
+            tar --create --verbose --file="$ARCHIVE_NAME" --directory "./prebuilds" .
+
+  build-windows:
+    machine:
+      image: windows-server-2022-gui:current
+      shell: bash.exe
+    resource_class: windows.medium
+    environment:
+      YARN_GPG: "no"
+    steps:
+      - checkout
+      - run:
+          name: Install Python 2
+          command: choco install -y python2
+      - run: yarn install
+      - run: yarn test
+      - run:
+          name: Prebuild
+          command: yarn prebuild
+      - run:
+          name: Prebuild IA32
+          command: yarn prebuild-ia32
+      - run:
+          name: Create archive
+          command: |
+            ARCHIVE_NAME="${CIRCLE_TAG:-latest}-windows-`uname -m`.tar"
+            tar --create --verbose --file="$ARCHIVE_NAME" --directory "./prebuilds" .
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build-linux
+      - build-macos
+      - build-windows
+
+  deploy:
+    jobs:
+      - build-linux:
+          requires:
+            - build-linux
+      - build-macos:
+          requires:
+            - build-macos
+      - build-windows:
+          requires:
+            - build-windows
+      - deploy:
+          name: Deploy
+          type: approval
+          requires:
+            - build-linux
+            - build-macos
+            - build-windows
+          steps:
+            - run:
+                name: Deploy to GitHub Releases
+                command: |
+                  curl -sL https://github.com/github-release/github-release/releases/download/v0.9.0/linux-amd64-github-release.bz2 | bzip2 -d > github-release
+                  chmod +x github-release
+                  ./github-release upload --tag $CIRCLE_TAG --name "$ARCHIVE_NAME" --file "$ARCHIVE_NAME" --prerelease
