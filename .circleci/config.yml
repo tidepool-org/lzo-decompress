@@ -22,7 +22,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - *.tar
+            - "*.tar"
 
 
   build-macos:
@@ -76,7 +76,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - *.tar
+            - "*.tar"
 
 
   build-windows:
@@ -125,7 +125,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - *.tar
+            - "*.tar"
 
   deploy:
     docker:
