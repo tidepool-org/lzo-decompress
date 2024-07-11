@@ -19,6 +19,11 @@ jobs:
           command: |
             ARCHIVE_NAME="${CIRCLE_TAG:-latest}-linux-`uname -m`.tar"
             tar --create --verbose --file="$ARCHIVE_NAME" --directory "./prebuilds" .
+      - persist_to_workspace:
+          root: .
+          paths:
+            - $ARCHIVE_NAME
+
 
   build-macos:
     resource_class: macos.m1.medium.gen1
@@ -68,6 +73,11 @@ jobs:
           command: |
             ARCHIVE_NAME="${CIRCLE_TAG:-latest}-macos-`uname -m`.tar"
             tar --create --verbose --file="$ARCHIVE_NAME" --directory "./prebuilds" .
+      - persist_to_workspace:
+          root: .
+          paths:
+            - $ARCHIVE_NAME
+
 
   build-windows:
     machine:
@@ -112,6 +122,10 @@ jobs:
           command: |
             ARCHIVE_NAME="${CIRCLE_TAG:-latest}-windows-`uname -m`.tar"
             tar --create --verbose --file="$ARCHIVE_NAME" --directory "./prebuilds" .
+      - persist_to_workspace:
+          root: .
+          paths:
+            - $ARCHIVE_NAME
 
   deploy:
     docker:
@@ -125,7 +139,9 @@ jobs:
       - run:
           name: Upload to GitHub Releases
           command: |
-            ./github-release upload --tag $CIRCLE_TAG --name "$ARCHIVE_NAME" --file "$ARCHIVE_NAME" --prerelease
+            for file in /workspace/*.tar; do
+              ./github-release upload --tag $CIRCLE_TAG --name "$(basename $file)" --file $file --prerelease
+            done
 
 workflows:
   version: 2
