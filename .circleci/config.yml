@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: sudo apt-get update && sudo apt-get install -y g++-4.8 gcc-4.8-multilib g++-4.8-multilib gcc-multilib g++-multilib libavutil-dev
+          command: sudo apt-get update && sudo apt-get install -y libavutil-dev
       - run: yarn install
       - run: yarn test
       - run:
@@ -59,9 +59,11 @@ jobs:
       - run:
           name: Modify macOS binaries
           command: |
-            cp "$PWD/lib/libavutil.dylib" "$PWD/prebuilds/darwin-x64/"
-            install_name_tool -change "/usr/local/lib/libavutil.56.dylib" "@loader_path/libavutil.dylib" "$PWD/prebuilds/darwin-x64/node.napi.node"
-            otool -L "$PWD/prebuilds/darwin-x64/node.napi.node"
+            cd $PWD/prebuilds
+            ls
+            cp "$PWD/lib/libavutil.dylib" "$PWD/prebuilds/darwin-arm64/"
+            install_name_tool -change "/usr/local/lib/libavutil.56.dylib" "@loader_path/libavutil.dylib" "$PWD/prebuilds/darwin-arm64/node.napi.node"
+            otool -L "$PWD/prebuilds/darwin-arm64/node.napi.node"
       - run:
           name: Create archive
           command: |
