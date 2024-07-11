@@ -22,7 +22,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - $ARCHIVE_NAME
+            - *.tar
 
 
   build-macos:
@@ -76,7 +76,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - $ARCHIVE_NAME
+            - *.tar
 
 
   build-windows:
@@ -125,12 +125,14 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - $ARCHIVE_NAME
+            - *.tar
 
   deploy:
     docker:
       - image: circleci/python:3.8
     steps:
+      - attach_workspace:
+          at: /workspace
       - run:
           name: Install GitHub release tool
           command: |
