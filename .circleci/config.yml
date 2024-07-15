@@ -138,6 +138,11 @@ jobs:
           command: |
             curl -sL https://github.com/github-release/github-release/releases/download/v0.9.0/linux-amd64-github-release.bz2 | bzip2 -d > github-release
             chmod +x github-release
+      
+      - run:
+          name: Create GitHub Release if not exists
+          command: |
+            ./github-release release --tag $CIRCLE_TAG --name $CIRCLE_TAG --description "Release $CIRCLE_TAG" --prerelease
       - run:
           name: Upload to GitHub Releases
           command: |
