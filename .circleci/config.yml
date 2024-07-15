@@ -134,22 +134,23 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Install GitHub release tool
+          name: Install gh
           command: |
-            curl -sL https://github.com/github-release/github-release/releases/download/v0.9.0/linux-amd64-github-release.bz2 | bzip2 -d > github-release
-            chmod +x github-release
-      
+            (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
+            && sudo mkdir -p -m 755 /etc/apt/keyrings \
+            && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+            && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+            && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+            && sudo apt update \
+            && sudo apt install gh -y
       - run:
-          name: Create GitHub Release if not exists
-          command: |
-            ./github-release release --tag $CIRCLE_TAG --name $CIRCLE_TAG --description "Release $CIRCLE_TAG" --pre-release
+          name: Get repo
+          command: git clone https://github.com/tidepool-org/lzo-decompress
       - run:
           name: Upload to GitHub Releases
           command: |
-            for file in ./*.tar; do
-              filename=$(basename "$file" .tar)
-              ./github-release upload --tag $CIRCLE_TAG --name "$filename" --file "$file"
-            done
+            cd lzo-decompress
+            gh release create $CIRCLE_TAG -t "$CIRCLE_TAG" -n "Release $CIRCLE_TAG" -p ../project/*.tar
 workflows:
   version: 2
   build-and-deploy:
