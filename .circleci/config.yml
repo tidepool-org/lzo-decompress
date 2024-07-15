@@ -142,7 +142,7 @@ jobs:
       - run:
           name: Create GitHub Release if not exists
           command: |
-            ./github-release release --tag $CIRCLE_TAG --name $CIRCLE_TAG --description "Release $CIRCLE_TAG" --prerelease
+            ./github-release release --tag $CIRCLE_TAG --name $CIRCLE_TAG --description "Release $CIRCLE_TAG" --pre-release
       - run:
           name: Upload to GitHub Releases
           command: |
