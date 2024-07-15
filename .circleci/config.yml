@@ -141,7 +141,7 @@ jobs:
       - run:
           name: Upload to GitHub Releases
           command: |
-            for file in /workspace/*.tar; do
+            for file in ./*.tar; do
               ./github-release upload --tag $CIRCLE_TAG --name "$(basename $file)" --file $file --prerelease
             done
 
