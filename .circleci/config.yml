@@ -145,14 +145,28 @@ jobs:
               filename=$(basename "$file" .tar)
               ./github-release upload --tag $CIRCLE_TAG --name "$filename" --file "$file"
             done
-
 workflows:
   version: 2
   build-and-deploy:
     jobs:
-      - build-linux
-      - build-macos
-      - build-windows
+      - build-linux:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - build-macos:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - build-windows:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
       - deploy:
           requires:
             - build-linux
@@ -161,4 +175,6 @@ workflows:
           filters:
             tags:
               only: /^v.*/
+            branches:
+              ignore: /.*/
 
