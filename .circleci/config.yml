@@ -4,6 +4,7 @@ jobs:
   build-linux:
     docker:
       - image: cimg/node:18.17.1
+    working_directory: /tmp
     steps:
       - checkout
       - run:
@@ -20,7 +21,7 @@ jobs:
             ARCHIVE_NAME="${CIRCLE_TAG:-latest}-linux-`uname -m`.tar"
             tar --create --verbose --file="$ARCHIVE_NAME" --directory "./prebuilds" .
       - persist_to_workspace:
-          root: .
+          root: workspace
           paths:
             - "*.tar"
 
@@ -31,6 +32,7 @@ jobs:
       BASH_ENV: ".circleci/bash_env.sh"
     macos:
       xcode: '13.4.1'
+    working_directory: /tmp
     steps:
       - checkout
       - run: echo 'export PATH=${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin' >> $BASH_ENV
@@ -74,7 +76,7 @@ jobs:
             ARCHIVE_NAME="${CIRCLE_TAG:-latest}-macos-`uname -m`.tar"
             tar --create --verbose --file="$ARCHIVE_NAME" --directory "./prebuilds" .
       - persist_to_workspace:
-          root: .
+          root: workspace
           paths:
             - "*.tar"
 
@@ -86,6 +88,7 @@ jobs:
     resource_class: windows.medium
     environment:
       YARN_GPG: "no"
+    working_directory: /tmp
     steps:
       - checkout
       - run:
@@ -123,7 +126,7 @@ jobs:
             ARCHIVE_NAME="${CIRCLE_TAG:-latest}-windows-`uname -m`.tar"
             tar --create --verbose --file="$ARCHIVE_NAME" --directory "./prebuilds" .
       - persist_to_workspace:
-          root: .
+          root: workspace
           paths:
             - "*.tar"
 
@@ -132,7 +135,7 @@ jobs:
       - image: circleci/python:3.8
     steps:
       - attach_workspace:
-          at: /workspace
+          at: /tmp/workspace
       - run:
           name: Install GitHub release tool
           command: |
