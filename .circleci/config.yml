@@ -4,7 +4,6 @@ jobs:
   build-linux:
     docker:
       - image: cimg/node:18.17.1
-    working_directory: /tmp
     steps:
       - checkout
       - run:
@@ -32,7 +31,6 @@ jobs:
       BASH_ENV: ".circleci/bash_env.sh"
     macos:
       xcode: '13.4.1'
-    working_directory: /tmp
     steps:
       - checkout
       - run: echo 'export PATH=${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin' >> $BASH_ENV
@@ -88,7 +86,6 @@ jobs:
     resource_class: windows.medium
     environment:
       YARN_GPG: "no"
-    working_directory: /tmp
     steps:
       - checkout
       - run:
@@ -135,7 +132,7 @@ jobs:
       - image: circleci/python:3.8
     steps:
       - attach_workspace:
-          at: /tmp/workspace
+          at: ./workspace
       - run:
           name: Install GitHub release tool
           command: |
