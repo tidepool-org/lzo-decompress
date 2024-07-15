@@ -142,7 +142,8 @@ jobs:
           name: Upload to GitHub Releases
           command: |
             for file in ./*.tar; do
-              ./github-release upload --tag $CIRCLE_TAG --name $(basename $file) --file $file
+              filename=$(basename "$file" .tar)
+              ./github-release upload --tag $CIRCLE_TAG --name "$filename" --file "$file"
             done
 
 workflows:
