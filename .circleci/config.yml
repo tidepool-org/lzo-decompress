@@ -150,7 +150,7 @@ jobs:
           name: Upload to GitHub Releases
           command: |
             cd lzo-decompress
-            gh release create $CIRCLE_TAG -t "$CIRCLE_TAG" -n "Release $CIRCLE_TAG" -p ../project/*.tar
+            gh release create $CIRCLE_TAG -t "$CIRCLE_TAG" -n "Release $CIRCLE_TAG" -p ../*.tar
 workflows:
   version: 2
   build-and-deploy:
