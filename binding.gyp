@@ -36,4 +36,7 @@
           "<!(node -e \"require('napi-macros')\")"
         ]
     }],
+    "variables": {
+        "openssl_fips": 0
+    }
 }

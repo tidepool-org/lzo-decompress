@@ -1,0 +1,186 @@
+version: 2.1
+
+jobs:
+  build-linux:
+    docker:
+      - image: cimg/node:18.17.1
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: sudo apt-get update && sudo apt-get install -y libavutil-dev
+      - run: yarn install
+      - run: yarn test
+      - run:
+          name: Prebuild
+          command: yarn prebuild
+      - run:
+          name: Create archive
+          command: |
+            ARCHIVE_NAME="${CIRCLE_TAG:-latest}-linux-`uname -m`.tar"
+            tar --create --verbose --file="$ARCHIVE_NAME" --directory "./prebuilds" .
+      - persist_to_workspace:
+          root: .
+          paths:
+            - "*.tar"
+
+
+  build-macos:
+    resource_class: macos.m1.medium.gen1
+    environment:
+      BASH_ENV: ".circleci/bash_env.sh"
+    macos:
+      xcode: '13.4.1'
+    steps:
+      - checkout
+      - run: echo 'export PATH=${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin' >> $BASH_ENV
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Install nvm and node
+          command: |
+            set +e
+            curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.5/install.sh | bash
+            source ~/.nvm/nvm.sh
+            nvm install v18.17.1
+            nvm alias default v18.17.1
+      - run: node -v
+      - run: npm install --global npm node-gyp
+      - run: npm -v
+      - run: node-gyp -v
+      - run: curl -o- -L https://yarnpkg.com/install.sh | bash
+      - run: yarn config set cache-folder ~/.cache/yarn
+      - run: yarn --frozen-lockfile
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ~/.cache/yarn
+            - ./node_modules
+      - run: yarn install
+      - run: yarn test
+      - run:
+          name: Prebuild
+          command: yarn prebuild
+      - run:
+          name: Modify macOS binaries
+          command: |
+            ls $PWD/prebuilds/darwin-arm64
+            cp "$PWD/lib/libavutil.dylib" "$PWD/prebuilds/darwin-arm64/"
+            install_name_tool -change "/usr/local/lib/libavutil.56.dylib" "@loader_path/libavutil.dylib" "$PWD/prebuilds/darwin-arm64/lzo-decompress.node"
+            otool -L "$PWD/prebuilds/darwin-arm64/lzo-decompress.node"
+      - run:
+          name: Create archive
+          command: |
+            ARCHIVE_NAME="${CIRCLE_TAG:-latest}-macos-`uname -m`.tar"
+            tar --create --verbose --file="$ARCHIVE_NAME" --directory "./prebuilds" .
+      - persist_to_workspace:
+          root: .
+          paths:
+            - "*.tar"
+
+
+  build-windows:
+    machine:
+      image: windows-server-2022-gui:current
+      shell: bash.exe
+    resource_class: windows.medium
+    environment:
+      YARN_GPG: "no"
+    steps:
+      - checkout
+      - run:
+          name: Install Python 2
+          command: choco install -y python2  
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run: python -m pip install packaging
+      - run: pip install setuptools
+      - run: nvm install v18.17.1
+      - run: nvm use v18.17.1
+      - run: node -v
+      - run: npm install --global npm@8 node-gyp
+      - run: npm -v
+      - run: node-gyp -v
+      - run: npm install --global yarn
+      - run: yarn config set cache-folder ~/.cache/yarn
+      - run: yarn --frozen-lockfile
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+          - ~/.cache/yarn
+          - ./node_modules
+      - run: yarn install
+      - run: yarn test
+      - run:
+          name: Prebuild
+          command: yarn prebuild
+      - run:
+          name: Prebuild IA32
+          command: yarn prebuild-ia32
+      - run:
+          name: Create archive
+          command: |
+            ARCHIVE_NAME="${CIRCLE_TAG:-latest}-windows-`uname -m`.tar"
+            tar --create --verbose --file="$ARCHIVE_NAME" --directory "./prebuilds" .
+      - persist_to_workspace:
+          root: .
+          paths:
+            - "*.tar"
+
+  deploy:
+    docker:
+      - image: cimg/python:3.8
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install gh
+          command: |
+            (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
+            && sudo mkdir -p -m 755 /etc/apt/keyrings \
+            && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+            && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+            && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+            && sudo apt update \
+            && sudo apt install gh -y
+      - run:
+          name: Get repo
+          command: git clone https://github.com/tidepool-org/lzo-decompress
+      - run:
+          name: Upload to GitHub Releases
+          command: |
+            cd lzo-decompress
+            gh release create $CIRCLE_TAG -t "$CIRCLE_TAG" -n "Release $CIRCLE_TAG" -p ../*.tar
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build-linux:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - build-macos:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - build-windows:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - deploy:
+          requires:
+            - build-linux
+            - build-macos
+            - build-windows
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+
